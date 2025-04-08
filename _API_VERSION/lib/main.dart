@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:ichwan_shoe_market/providers/auth_provider.dart';
 import 'package:ichwan_shoe_market/routes/routes.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => AuthProvider()),
+  ], child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

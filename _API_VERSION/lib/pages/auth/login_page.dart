@@ -1,9 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:ichwan_shoe_market/models/user_model.dart';
+import 'package:ichwan_shoe_market/providers/auth_provider.dart';
+import 'package:ichwan_shoe_market/services/auth_service.dart';
 import 'package:ichwan_shoe_market/theme.dart';
+import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  TextEditingController usernameController = TextEditingController(text: '');
+  TextEditingController passwordController = TextEditingController(text: '');
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +48,7 @@ class LoginPage extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Email Address',
+                    Text('Email / Username',
                         style: textStyle.copyWith(
                             color: primaryTextColor,
                             fontSize: 18,
@@ -62,13 +73,13 @@ class LoginPage extends StatelessWidget {
                           ),
                           Expanded(
                             child: TextFormField(
-                              controller: null,
+                              controller: usernameController,
                               style: textStyle.copyWith(
                                   color: primaryTextColor,
                                   fontSize: 16,
                                   fontWeight: medium),
                               decoration: InputDecoration.collapsed(
-                                  hintText: 'Your Email Address',
+                                  hintText: 'Your Email / Username',
                                   hintStyle: textStyle.copyWith(
                                       color: placeholderTextColor,
                                       fontSize: 16,
@@ -110,7 +121,7 @@ class LoginPage extends StatelessWidget {
                           ),
                           Expanded(
                             child: TextFormField(
-                              controller: null,
+                              controller: passwordController,
                               style: textStyle.copyWith(
                                   color: primaryTextColor,
                                   fontSize: 16,
@@ -132,7 +143,26 @@ class LoginPage extends StatelessWidget {
 
             // * LOGIN BUTTON
             GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/main-page'),
+              onTap: () async {
+                final authService = AuthService();
+                final authProvider =
+                    Provider.of<AuthProvider>(context, listen: false);
+
+                final UserModel? user = await authService.login(
+                  username: usernameController.text,
+                  password: passwordController.text,
+                );
+
+                if (user != null) {
+                  await authProvider.login(user);
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/main-page', (route) => false);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Login gagal')),
+                  );
+                }
+              },
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
