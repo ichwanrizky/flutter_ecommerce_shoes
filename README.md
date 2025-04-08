@@ -49,3 +49,20 @@ A beautifully designed and responsive e-commerce mobile app built using Flutter,
 - **Next.js** (for API integration – coming soon)
 
 ---
+
+## 🙋‍♂️ Author
+
+**Mohammad Ichwan Rizky Kurnia**  
+💼 Full-Stack Developer (Flutter · PHP Native · Next.js)  
+📍 Indonesia  
+📫 GitHub: [@ichwanrizky](https://github.com/ichwanrizky)
+📫 LinkedIn: (https://www.linkedin.com/in/ichwan-rizky-67ba101b3)
+
+I build modern and scalable applications for mobile & web. Currently focusing on improving my frontend skills and building strong personal branding through portfolio projects like this.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.  
+See the [LICENSE](LICENSE) file for more details.
