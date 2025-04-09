@@ -16,8 +16,25 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController usernameController = TextEditingController(text: '');
   TextEditingController passwordController = TextEditingController(text: '');
 
+  bool _isShowingSnackBar = false;
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
+    void showAppSnackBar(String message, Color color) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: color,
+              // 1s
+              duration: const Duration(milliseconds: 800),
+            ),
+          )
+          .closed
+          .then((value) => _isShowingSnackBar = false);
+    }
+
     Widget header() {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,6 +51,97 @@ class _LoginPageState extends State<LoginPage> {
                   fontSize: 16,
                   fontWeight: regular)),
         ],
+      );
+    }
+
+    Widget loginButton() {
+      return GestureDetector(
+        onTap: () async {
+          if (!_isShowingSnackBar && !_isLoading) {
+            setState(() {
+              _isShowingSnackBar = true;
+            });
+
+            if (usernameController.text == '' ||
+                passwordController.text == '') {
+              showAppSnackBar('Please fill all the fields', alertColor);
+              return;
+            }
+
+            setState(() {
+              _isLoading = true;
+            });
+
+            final authService = AuthService();
+            final authProvider =
+                Provider.of<AuthProvider>(context, listen: false);
+
+            final result = await authService.login(
+              username: usernameController.text,
+              password: passwordController.text,
+            );
+
+            final bool status = result?['status'];
+            final String message = result?['message'];
+
+            showAppSnackBar(
+              message,
+              status ? Colors.green : alertColor,
+            );
+
+            if (status) {
+              final UserModel user = result?['user'];
+              await authProvider.login(user);
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/main-page', (route) => false);
+            }
+
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        },
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: _isLoading ? primaryColor.withOpacity(0.2) : primaryColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          child: Center(
+            child: _isLoading
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Please Wait ...',
+                        style: textStyle.copyWith(
+                            color: primaryTextColor.withOpacity(0.5),
+                            fontSize: 16,
+                            fontWeight: semiBold),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: primaryTextColor.withOpacity(0.5),
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    'Login',
+                    style: textStyle.copyWith(
+                        color: primaryTextColor,
+                        fontSize: 16,
+                        fontWeight: semiBold),
+                  ),
+          ),
+        ),
       );
     }
 
@@ -142,88 +250,53 @@ class _LoginPageState extends State<LoginPage> {
             ),
 
             // * LOGIN BUTTON
-            GestureDetector(
-              onTap: () async {
-                final authService = AuthService();
-                final authProvider =
-                    Provider.of<AuthProvider>(context, listen: false);
-
-                final UserModel? user = await authService.login(
-                  username: usernameController.text,
-                  password: passwordController.text,
-                );
-
-                if (user != null) {
-                  await authProvider.login(user);
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, '/main-page', (route) => false);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Login gagal')),
-                  );
-                }
-              },
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: primaryColor,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                child: Center(
-                  child: Text(
-                    'Login',
-                    style: textStyle.copyWith(
-                        color: primaryTextColor,
-                        fontSize: 16,
-                        fontWeight: semiBold),
-                  ),
-                ),
-              ),
-            )
+            loginButton()
           ],
         ),
       );
     }
 
     Widget footer() {
-      return Container(
-        margin: const EdgeInsets.only(bottom: 30),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Don\'t have an account?',
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Don\'t have an account?',
+            style: textStyle.copyWith(
+                color: placeholderTextColor, fontSize: 14, fontWeight: medium),
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          GestureDetector(
+            onTap: () => Navigator.pushNamed(context, '/register-page'),
+            child: Text(
+              'Register Here',
               style: textStyle.copyWith(
-                  color: placeholderTextColor,
-                  fontSize: 14,
-                  fontWeight: medium),
+                  color: primaryColor, fontSize: 14, fontWeight: semiBold),
             ),
-            const SizedBox(
-              width: 5,
-            ),
-            GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/register-page'),
-              child: Text(
-                'Register Here',
-                style: textStyle.copyWith(
-                    color: primaryColor, fontSize: 14, fontWeight: semiBold),
-              ),
-            )
-          ],
-        ),
+          )
+        ],
       );
     }
 
     return Scaffold(
       backgroundColor: bgColor1,
-      body: Container(
-        margin: const EdgeInsets.only(top: 30, left: 30, right: 30),
-        child: ListView(
-          children: [header(), loginForm()],
+      body: SafeArea(
+        child: Container(
+          margin: const EdgeInsets.all(30),
+          child: ListView(
+            children: [
+              header(),
+              loginForm(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.25,
+              ),
+              footer()
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: footer(),
     );
   }
 }

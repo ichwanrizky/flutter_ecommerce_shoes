@@ -1,27 +1,187 @@
 import 'package:flutter/material.dart';
+import 'package:ichwan_shoe_market/services/auth_service.dart';
 import 'package:ichwan_shoe_market/theme.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  TextEditingController fullNameController = TextEditingController(text: '');
+  TextEditingController usernameController = TextEditingController(text: '');
+  TextEditingController emailController = TextEditingController(text: '');
+  TextEditingController passwordController = TextEditingController(text: '');
+
+  bool _isShowingSnackBar = false;
+  bool _isLoading = false;
+
+  @override
   Widget build(BuildContext context) {
+    void showAppSnackBar(String message, Color color) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: color,
+              duration: const Duration(milliseconds: 800),
+            ),
+          )
+          .closed
+          .then((value) => _isShowingSnackBar = false);
+    }
+
     Widget header() {
-      return Column(
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Register Page',
-              style: textStyle.copyWith(
-                  color: primaryTextColor, fontSize: 26, fontWeight: semiBold)),
-          const SizedBox(
-            height: 5,
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: const Icon(
+              Icons.chevron_left,
+              color: primaryTextColor,
+              size: 35,
+            ),
           ),
-          Text('Register and Happy Shoping',
-              style: textStyle.copyWith(
-                  color: secondaryTextColor,
-                  fontSize: 16,
-                  fontWeight: regular)),
+          const SizedBox(
+            width: 15,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Register Page',
+                  style: textStyle.copyWith(
+                      color: primaryTextColor,
+                      fontSize: 26,
+                      fontWeight: semiBold)),
+              const SizedBox(
+                height: 5,
+              ),
+              Text('Register and Happy Shoping',
+                  style: textStyle.copyWith(
+                      color: secondaryTextColor,
+                      fontSize: 16,
+                      fontWeight: regular)),
+            ],
+          ),
         ],
+      );
+    }
+
+    Widget registerButton() {
+      return GestureDetector(
+        onTap: () async {
+          if (!_isShowingSnackBar && !_isLoading) {
+            setState(() {
+              _isShowingSnackBar = true;
+            });
+
+            if (fullNameController.text == '' ||
+                usernameController.text == '' ||
+                emailController.text == '' ||
+                passwordController.text == '') {
+              showAppSnackBar('Please fill all the fields', alertColor);
+              return;
+            }
+
+            final confirm = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Confirm Registration'),
+                content: const Text(
+                    'Are you sure you want to register with this information?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Register'),
+                  ),
+                ],
+              ),
+            );
+
+            if (confirm != true) {
+              setState(() {
+                _isShowingSnackBar = false;
+              });
+              return;
+            }
+
+            setState(() {
+              _isLoading = true;
+            });
+
+            final authService = AuthService();
+
+            final result = await authService.register(
+                fullName: fullNameController.text,
+                username: usernameController.text,
+                email: emailController.text,
+                password: passwordController.text);
+
+            final bool status = result?['status'];
+            final String message = result?['message'];
+
+            showAppSnackBar(message, status ? Colors.green : alertColor);
+            if (status) {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/login-page', (route) => false);
+
+              return;
+            }
+
+            setState(() {
+              _isLoading = false;
+            });
+          }
+        },
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: _isLoading ? primaryColor.withOpacity(0.5) : primaryColor,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          child: Center(
+            child: _isLoading
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Please Wait ...',
+                        style: textStyle.copyWith(
+                            color: primaryTextColor.withOpacity(0.5),
+                            fontSize: 16,
+                            fontWeight: semiBold),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: primaryTextColor.withOpacity(0.5),
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ],
+                  )
+                : Text(
+                    'Register',
+                    style: textStyle.copyWith(
+                        color: primaryTextColor,
+                        fontSize: 16,
+                        fontWeight: semiBold),
+                  ),
+          ),
+        ),
       );
     }
 
@@ -61,7 +221,7 @@ class RegisterPage extends StatelessWidget {
                           ),
                           Expanded(
                             child: TextFormField(
-                              controller: null,
+                              controller: fullNameController,
                               style: textStyle.copyWith(
                                   color: primaryTextColor,
                                   fontSize: 16,
@@ -109,7 +269,7 @@ class RegisterPage extends StatelessWidget {
                           ),
                           Expanded(
                             child: TextFormField(
-                              controller: null,
+                              controller: usernameController,
                               style: textStyle.copyWith(
                                   color: primaryTextColor,
                                   fontSize: 16,
@@ -157,7 +317,7 @@ class RegisterPage extends StatelessWidget {
                           ),
                           Expanded(
                             child: TextFormField(
-                              controller: null,
+                              controller: emailController,
                               style: textStyle.copyWith(
                                   color: primaryTextColor,
                                   fontSize: 16,
@@ -205,7 +365,7 @@ class RegisterPage extends StatelessWidget {
                           ),
                           Expanded(
                             child: TextFormField(
-                              controller: null,
+                              controller: passwordController,
                               style: textStyle.copyWith(
                                   color: primaryTextColor,
                                   fontSize: 16,
@@ -226,23 +386,7 @@ class RegisterPage extends StatelessWidget {
             ),
 
             // REGISTER BUTTON
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: primaryColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              padding: const EdgeInsets.symmetric(vertical: 15),
-              child: Center(
-                child: Text(
-                  'Register',
-                  style: textStyle.copyWith(
-                      color: primaryTextColor,
-                      fontSize: 16,
-                      fontWeight: semiBold),
-                ),
-              ),
-            )
+            registerButton(),
           ],
         ),
       );
@@ -285,10 +429,10 @@ class RegisterPage extends StatelessWidget {
           children: [
             header(),
             registerForm(),
+            footer(),
           ],
         ),
       ),
-      bottomNavigationBar: footer(),
     );
   }
 }
