@@ -19,18 +19,37 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
 
   @override
+  void dispose() {
+    fullNameController.dispose();
+    usernameController.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     void showAppSnackBar(String message, Color color) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: color,
-              duration: const Duration(milliseconds: 800),
-            ),
-          )
-          .closed
-          .then((value) => _isShowingSnackBar = false);
+      if (!_isShowingSnackBar) {
+        _isShowingSnackBar = true;
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: color,
+                duration: const Duration(milliseconds: 800),
+              ),
+            )
+            .closed
+            .then((_) {
+          if (mounted) {
+            setState(() {
+              _isShowingSnackBar = false;
+            });
+          }
+        });
+      }
     }
 
     Widget header() {
@@ -75,15 +94,16 @@ class _RegisterPageState extends State<RegisterPage> {
       return GestureDetector(
         onTap: () async {
           if (!_isShowingSnackBar && !_isLoading) {
-            setState(() {
-              _isShowingSnackBar = true;
-            });
-
             if (fullNameController.text == '' ||
                 usernameController.text == '' ||
                 emailController.text == '' ||
                 passwordController.text == '') {
               showAppSnackBar('Please fill all the fields', alertColor);
+              return;
+            }
+
+            if (!emailController.text.contains('@')) {
+              showAppSnackBar('Email tidak valid', alertColor);
               return;
             }
 
@@ -107,9 +127,6 @@ class _RegisterPageState extends State<RegisterPage> {
             );
 
             if (confirm != true) {
-              setState(() {
-                _isShowingSnackBar = false;
-              });
               return;
             }
 

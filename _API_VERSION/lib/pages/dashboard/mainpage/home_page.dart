@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:ichwan_shoe_market/models/product_model.dart';
 import 'package:ichwan_shoe_market/pages/dashboard/mainpage/products/newarrivalsproduct.dart';
 import 'package:ichwan_shoe_market/pages/dashboard/mainpage/products/popularproduct.dart';
+import 'package:ichwan_shoe_market/providers/auth_provider.dart';
+import 'package:ichwan_shoe_market/services/product_service.dart';
 import 'package:ichwan_shoe_market/theme.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,24 +26,52 @@ class _HomePageState extends State<HomePage> {
     {'key': 'footbal', 'value': 'Football'},
   ];
 
+  List<ProductModel> _popularProducts = [];
+  bool _isLoading = true;
+
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   fetchProduct();
+  // }
+
+  // Future<void> fetchProduct() async {
+  //   final productService = ProductServices();
+  //   final result = await productService.getProducts();
+  //   if (result?['status']) {
+  //     List<ProductModel> data = result?['products'];
+  //     setState(() {
+  //       _popularProducts = data;
+  //       _isLoading = false;
+  //     });
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final productService = ProductServices();
+    final user = authProvider.user;
     Widget header() {
       return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Hallo, Ichwan',
-                    style: textStyle.copyWith(
-                        color: primaryTextColor,
-                        fontSize: 26,
-                        fontWeight: semiBold)),
+                Text(
+                  'Hallo, ${user?.name}',
+                  style: textStyle.copyWith(
+                      color: primaryTextColor,
+                      fontSize: 26,
+                      fontWeight: semiBold),
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(
                   height: 5,
                 ),
-                Text('@ichwanrizky',
+                Text('@${user?.username}',
                     style: textStyle.copyWith(
                         color: secondaryTextColor,
                         fontSize: 16,
@@ -49,6 +82,7 @@ class _HomePageState extends State<HomePage> {
           Container(
             width: 64,
             height: 64,
+            margin: const EdgeInsets.only(left: 10),
             decoration: const BoxDecoration(shape: BoxShape.circle),
             clipBehavior: Clip.antiAlias,
             child: Image.asset(
@@ -117,23 +151,53 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(
             height: 15,
           ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: () =>
-                      Navigator.pushNamed(context, '/product-detail-page'),
-                  child: PopularProduct(),
+          FutureBuilder<Map<String, dynamic>?>(
+            future: productService.getProducts(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                final result = snapshot.data;
+
+                if (result?['status']) {
+                  List<ProductModel> data = result?['products'];
+
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        children: data
+                            .map((e) => PopularProduct(popularProduct: e))
+                            .toList()),
+                  );
+                } else {
+                  return Text(
+                    '${result?['message']}',
+                    style: textStyle.copyWith(fontSize: 16, color: alertColor),
+                    textAlign: TextAlign.left,
+                  );
+                }
+              }
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                // loop manual 4
+                child: Row(
+                  children: List.generate(
+                      3,
+                      (index) => Shimmer.fromColors(
+                            baseColor: const Color(
+                                0xFFF6F6F6), // abu gelap (gelap banget)
+                            highlightColor: const Color(0xFFE0E0E0),
+                            child: Container(
+                              margin: const EdgeInsets.only(right: 30),
+                              width: 215,
+                              height: 278,
+                              decoration: BoxDecoration(
+                                color: bgCard,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ), // Shimmer highlight color
+                          )),
                 ),
-                PopularProduct(),
-                PopularProduct(),
-                PopularProduct(),
-                PopularProduct(),
-                PopularProduct(),
-                PopularProduct(),
-              ],
-            ),
+              );
+            },
           )
         ],
       );

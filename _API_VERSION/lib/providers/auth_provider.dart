@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +18,20 @@ class AuthProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', user.accessToken);
 
+    final userJson = jsonEncode(user);
+    await prefs.setString('user', userJson);
+
     notifyListeners();
+  }
+
+  Future<void> loadUserFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userData = prefs.getString('user');
+
+    if (userData != null) {
+      final userMap = jsonDecode(userData);
+      _user = UserModel.fromJson(userMap);
+      notifyListeners();
+    }
   }
 }

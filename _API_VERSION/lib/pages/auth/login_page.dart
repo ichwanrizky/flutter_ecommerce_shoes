@@ -20,19 +20,35 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     void showAppSnackBar(String message, Color color) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-            SnackBar(
-              content: Text(message),
-              backgroundColor: color,
-              // 1s
-              duration: const Duration(milliseconds: 800),
-            ),
-          )
-          .closed
-          .then((value) => _isShowingSnackBar = false);
+      if (!_isShowingSnackBar) {
+        _isShowingSnackBar = true;
+
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: color,
+                duration: const Duration(milliseconds: 800),
+              ),
+            )
+            .closed
+            .then((_) {
+          if (mounted) {
+            setState(() {
+              _isShowingSnackBar = false;
+            });
+          }
+        });
+      }
     }
 
     Widget header() {
@@ -58,10 +74,6 @@ class _LoginPageState extends State<LoginPage> {
       return GestureDetector(
         onTap: () async {
           if (!_isShowingSnackBar && !_isLoading) {
-            setState(() {
-              _isShowingSnackBar = true;
-            });
-
             if (usernameController.text == '' ||
                 passwordController.text == '') {
               showAppSnackBar('Please fill all the fields', alertColor);
