@@ -23,8 +23,6 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const CartPage());
       case '/checkout-page':
         return MaterialPageRoute(builder: (_) => const CheckoutPage());
-      case '/product-detail-page':
-        return MaterialPageRoute(builder: (_) => const ProductDetailPage());
       default:
         return MaterialPageRoute(
           builder: (_) => const Scaffold(

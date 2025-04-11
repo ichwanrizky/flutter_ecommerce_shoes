@@ -1,8 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:ichwan_shoe_market/constant.dart';
+import 'package:ichwan_shoe_market/models/product_model.dart';
 import 'package:ichwan_shoe_market/theme.dart';
 
 class FamiliarProducts extends StatelessWidget {
-  const FamiliarProducts({super.key});
+  final ProductModel product;
+  const FamiliarProducts({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
@@ -15,9 +18,15 @@ class FamiliarProducts extends StatelessWidget {
           color: bgCard,
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Image.asset(
-          'assets/images/exshoes.png',
-          fit: BoxFit.contain,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            '$imageUrl${product.coverImage}',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            errorBuilder: (context, error, stackTrace) =>
+                const Icon(Icons.broken_image),
+          ),
         ),
       ),
     );

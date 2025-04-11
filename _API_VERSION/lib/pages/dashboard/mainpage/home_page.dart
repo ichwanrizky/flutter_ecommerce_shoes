@@ -22,30 +22,9 @@ class _HomePageState extends State<HomePage> {
     {'key': 'all', 'value': 'All Shoes'},
     {'key': 'running', 'value': 'Running'},
     {'key': 'training', 'value': 'Training'},
-    {'key': 'basket', 'value': 'Basketball'},
-    {'key': 'footbal', 'value': 'Football'},
+    {'key': 'basketball', 'value': 'Basketball'},
+    {'key': 'football', 'value': 'Football'},
   ];
-
-  List<ProductModel> _popularProducts = [];
-  bool _isLoading = true;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   fetchProduct();
-  // }
-
-  // Future<void> fetchProduct() async {
-  //   final productService = ProductServices();
-  //   final result = await productService.getProducts();
-  //   if (result?['status']) {
-  //     List<ProductModel> data = result?['products'];
-  //     setState(() {
-  //       _popularProducts = data;
-  //       _isLoading = false;
-  //     });
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -152,13 +131,23 @@ class _HomePageState extends State<HomePage> {
             height: 15,
           ),
           FutureBuilder<Map<String, dynamic>?>(
-            future: productService.getProducts(),
+            future:
+                productService.getProducts(currentCategories, isPopular: true),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.done) {
                 final result = snapshot.data;
 
                 if (result?['status']) {
                   List<ProductModel> data = result?['products'];
+
+                  if (data.isEmpty) {
+                    return Text(
+                      'Product is empty',
+                      style:
+                          textStyle.copyWith(fontSize: 16, color: alertColor),
+                      textAlign: TextAlign.left,
+                    );
+                  }
 
                   return SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
@@ -219,12 +208,115 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(
             height: 15,
           ),
-          NewArrivalsProduct(),
-          NewArrivalsProduct(),
-          NewArrivalsProduct(),
-          NewArrivalsProduct(),
-          NewArrivalsProduct(),
-          NewArrivalsProduct(),
+          FutureBuilder(
+              future:
+                  productService.getProducts(currentCategories, isNew: true),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  final result = snapshot.data;
+
+                  if (result?['status']) {
+                    List<ProductModel> data = result?['products'];
+
+                    if (data.isEmpty) {
+                      return Text(
+                        'Product is empty',
+                        style:
+                            textStyle.copyWith(fontSize: 16, color: alertColor),
+                        textAlign: TextAlign.left,
+                      );
+                    }
+
+                    return Column(
+                      children: data
+                          .map((e) => NewArrivalsProduct(
+                                newArrivalsProduct: e,
+                              ))
+                          .toList(),
+                    );
+                  } else {
+                    return Text(
+                      '${result?['message']}',
+                      style:
+                          textStyle.copyWith(fontSize: 16, color: alertColor),
+                      textAlign: TextAlign.left,
+                    );
+                  }
+                }
+
+                return Column(
+                    children: List.generate(
+                  3,
+                  (index) => Container(
+                    margin: const EdgeInsets.only(bottom: 30),
+                    child: Row(children: [
+                      Shimmer.fromColors(
+                          baseColor: const Color(
+                              0xFFF6F6F6), // abu gelap (gelap banget)
+                          highlightColor: const Color(0xFFE0E0E0),
+                          child: Container(
+                            width: 120,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: bgCard,
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          )),
+                      const SizedBox(
+                        width: 12,
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Shimmer.fromColors(
+                                baseColor: const Color(
+                                    0xFFF6F6F6), // abu gelap (gelap banget)
+                                highlightColor:
+                                    const Color.fromARGB(255, 173, 171, 171),
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  width: 120,
+                                  height: 15,
+                                  decoration: BoxDecoration(
+                                    color: bgCard,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                )),
+                            Shimmer.fromColors(
+                                baseColor: const Color(
+                                    0xFFF6F6F6), // abu gelap (gelap banget)
+                                highlightColor:
+                                    const Color.fromARGB(255, 173, 171, 171),
+                                child: Container(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  width: 200,
+                                  height: 15,
+                                  decoration: BoxDecoration(
+                                    color: bgCard,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                )),
+                            Shimmer.fromColors(
+                                baseColor: const Color(
+                                    0xFFF6F6F6), // abu gelap (gelap banget)
+                                highlightColor:
+                                    const Color.fromARGB(255, 173, 171, 171),
+                                child: Container(
+                                  width: 80,
+                                  height: 15,
+                                  decoration: BoxDecoration(
+                                    color: bgCard,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                )),
+                          ],
+                        ),
+                      )
+                    ]),
+                  ),
+                ));
+              })
         ],
       );
     }

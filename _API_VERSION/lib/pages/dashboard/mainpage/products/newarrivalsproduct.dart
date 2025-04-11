@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:ichwan_shoe_market/constant.dart';
+import 'package:ichwan_shoe_market/models/product_model.dart';
 import 'package:ichwan_shoe_market/theme.dart';
+import 'package:intl/intl.dart';
 
 class NewArrivalsProduct extends StatelessWidget {
-  const NewArrivalsProduct({super.key});
+  final ProductModel newArrivalsProduct;
+
+  const NewArrivalsProduct({super.key, required this.newArrivalsProduct});
 
   @override
   Widget build(BuildContext context) {
@@ -12,17 +16,22 @@ class NewArrivalsProduct extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              color: bgCard,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Image.asset(
-              'assets/images/exshoes.png',
-              fit: BoxFit.contain,
-            ),
-          ),
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: bgCard,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Image.network(
+                  '$imageUrl${newArrivalsProduct.coverImage}',
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.broken_image),
+                ),
+              )),
           const SizedBox(
             width: 12,
           ),
@@ -31,19 +40,19 @@ class NewArrivalsProduct extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hiking',
+                  newArrivalsProduct.category,
                   style: textStyle.copyWith(
                       color: placeholderTextColor, fontSize: 14),
                 ),
                 Text(
-                  'Predator 20.3 Firm Ground',
+                  newArrivalsProduct.productName,
                   style: textStyle.copyWith(
                       color: primaryTextColor,
                       fontSize: 18,
                       fontWeight: semiBold),
                 ),
                 Text(
-                  '\$58,67',
+                  'IDR ${NumberFormat.decimalPattern().format(newArrivalsProduct.price)}',
                   style: textStyle.copyWith(
                       color: priceColor, fontSize: 14, fontWeight: medium),
                 )
