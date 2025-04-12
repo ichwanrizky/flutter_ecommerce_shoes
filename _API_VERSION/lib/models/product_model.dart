@@ -20,18 +20,19 @@ class ProductModel {
   DateTime createdAt;
   DateTime updatedAt;
   String coverImage;
+  bool? favorites;
 
-  ProductModel({
-    required this.id,
-    required this.productName,
-    required this.category,
-    required this.price,
-    required this.isPopular,
-    required this.isNew,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.coverImage,
-  });
+  ProductModel(
+      {required this.id,
+      required this.productName,
+      required this.category,
+      required this.price,
+      required this.isPopular,
+      required this.isNew,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.coverImage,
+      this.favorites});
 
   factory ProductModel.fromJson(Map<String, dynamic> json) => ProductModel(
         id: json["id"],
@@ -43,6 +44,7 @@ class ProductModel {
         createdAt: DateTime.parse(json["created_at"]),
         updatedAt: DateTime.parse(json["updated_at"]),
         coverImage: json["cover_image"],
+        favorites: json['favorites'] ?? false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -55,5 +57,6 @@ class ProductModel {
         "created_at": createdAt.toIso8601String(),
         "updated_at": updatedAt.toIso8601String(),
         "cover_image": coverImage,
+        "favorites": favorites
       };
 }

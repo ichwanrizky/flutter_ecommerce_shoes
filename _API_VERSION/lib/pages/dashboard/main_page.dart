@@ -41,102 +41,100 @@ class _MainPageState extends State<MainPage> {
       }
     }
 
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: bgColor3,
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: secondaryColor,
-          shape: const StadiumBorder(),
-          onPressed: () => Navigator.pushNamed(context, '/cart-page'),
-          child: Image.asset(
-            'assets/icons/CartIcon.png',
-            width: 20,
-          ),
+    return Scaffold(
+      backgroundColor: bgColor3,
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: secondaryColor,
+        shape: const StadiumBorder(),
+        onPressed: () => Navigator.pushNamed(context, '/cart-page'),
+        child: Image.asset(
+          'assets/icons/CartIcon.png',
+          width: 20,
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: ClipRRect(
-          borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(25), topRight: Radius.circular(25)),
-          child: BottomAppBar(
-            shape: const CircularNotchedRectangle(),
-            notchMargin: 15,
-            color: bgNavbar,
-            child: BottomNavigationBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              selectedFontSize: 0,
-              unselectedFontSize: 0,
-              type: BottomNavigationBarType.fixed,
-              onTap: (value) => setState(() {
-                currentIndex = value;
-              }),
-              items: [
-                BottomNavigationBarItem(
-                    icon: Container(
-                      margin: const EdgeInsets.only(right: 25),
-                      child: SizedBox(
-                        height: 26,
-                        child: Image.asset(
-                          'assets/icons/Home.png',
-                          fit: BoxFit.contain,
-                          color: currentIndex == 0
-                              ? primaryColor
-                              : secondaryTextColor,
-                        ),
-                      ),
-                    ),
-                    label: ''),
-                BottomNavigationBarItem(
-                    icon: Container(
-                      margin: const EdgeInsets.only(right: 50),
-                      child: SizedBox(
-                        height: 26,
-                        child: Image.asset(
-                          'assets/icons/ChatIcon.png',
-                          fit: BoxFit.contain,
-                          color: currentIndex == 1
-                              ? primaryColor
-                              : secondaryTextColor,
-                        ),
-                      ),
-                    ),
-                    label: ''),
-                BottomNavigationBarItem(
-                    icon: Container(
-                      margin: const EdgeInsets.only(left: 50),
-                      child: SizedBox(
-                        height: 26,
-                        child: Image.asset(
-                          'assets/icons/Union-3.png',
-                          fit: BoxFit.contain,
-                          color: currentIndex == 2
-                              ? primaryColor
-                              : secondaryTextColor,
-                        ),
-                      ),
-                    ),
-                    label: ''),
-                BottomNavigationBarItem(
-                    icon: Container(
-                      margin: const EdgeInsets.only(left: 25),
-                      child: SizedBox(
-                        height: 28,
-                        child: Image.asset(
-                          'assets/icons/Profile.png',
-                          fit: BoxFit.contain,
-                          color: currentIndex == 3
-                              ? primaryColor
-                              : secondaryTextColor,
-                        ),
-                      ),
-                    ),
-                    label: '')
-              ],
-            ),
-          ),
-        ),
-        body: pages(),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: ClipRRect(
+        borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+        child: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 15,
+          color: bgNavbar,
+          child: BottomNavigationBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedFontSize: 0,
+            unselectedFontSize: 0,
+            type: BottomNavigationBarType.fixed,
+            onTap: (value) => setState(() {
+              currentIndex = value;
+            }),
+            items: [
+              BottomNavigationBarItem(
+                  icon: Container(
+                    margin: const EdgeInsets.only(right: 25),
+                    child: SizedBox(
+                      height: 26,
+                      child: Image.asset(
+                        'assets/icons/Home.png',
+                        fit: BoxFit.contain,
+                        color: currentIndex == 0
+                            ? primaryColor
+                            : secondaryTextColor,
+                      ),
+                    ),
+                  ),
+                  label: ''),
+              BottomNavigationBarItem(
+                  icon: Container(
+                    margin: const EdgeInsets.only(right: 50),
+                    child: SizedBox(
+                      height: 26,
+                      child: Image.asset(
+                        'assets/icons/ChatIcon.png',
+                        fit: BoxFit.contain,
+                        color: currentIndex == 1
+                            ? primaryColor
+                            : secondaryTextColor,
+                      ),
+                    ),
+                  ),
+                  label: ''),
+              BottomNavigationBarItem(
+                  icon: Container(
+                    margin: const EdgeInsets.only(left: 50),
+                    child: SizedBox(
+                      height: 26,
+                      child: Image.asset(
+                        'assets/icons/Union-3.png',
+                        fit: BoxFit.contain,
+                        color: currentIndex == 2
+                            ? primaryColor
+                            : secondaryTextColor,
+                      ),
+                    ),
+                  ),
+                  label: ''),
+              BottomNavigationBarItem(
+                  icon: Container(
+                    margin: const EdgeInsets.only(left: 25),
+                    child: SizedBox(
+                      height: 28,
+                      child: Image.asset(
+                        'assets/icons/Profile.png',
+                        fit: BoxFit.contain,
+                        color: currentIndex == 3
+                            ? primaryColor
+                            : secondaryTextColor,
+                      ),
+                    ),
+                  ),
+                  label: '')
+            ],
+          ),
+        ),
+      ),
+      body: pages(),
     );
   }
 }

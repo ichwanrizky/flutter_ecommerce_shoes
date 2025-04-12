@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ichwan_shoe_market/models/product_model.dart';
+import 'package:ichwan_shoe_market/pages/dashboard/mainpage/product_detail_page.dart';
 import 'package:ichwan_shoe_market/pages/dashboard/mainpage/products/newarrivalsproduct.dart';
 import 'package:ichwan_shoe_market/pages/dashboard/mainpage/products/popularproduct.dart';
 import 'package:ichwan_shoe_market/providers/auth_provider.dart';
@@ -153,7 +154,19 @@ class _HomePageState extends State<HomePage> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                         children: data
-                            .map((e) => PopularProduct(popularProduct: e))
+                            .map((e) => GestureDetector(
+                                onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ProductDetailPage(
+                                                  productId: e.id,
+                                                ))).then((value) {
+                                      if (value == true) {
+                                        setState(() {});
+                                      }
+                                    }),
+                                child: PopularProduct(popularProduct: e)))
                             .toList()),
                   );
                 } else {
